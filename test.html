@@ -111,45 +111,52 @@
 <body>
     <div class="container">
         <h2 class="title">问卷回答详情</h2>
-        <!-- 数据展示区域 -->
         <div id="app"></div>
     </div>
 
     <script>
-        // 接口地址（请替换为你的真实接口地址）
+        // 1. 替换为你的真实 POST 接口地址
         const API_URL = 'https://xlab.ai-space.net/api/activity/getAnwserInfo/86';
+        
+        // 2. POST 请求需要的参数（根据接口要求修改）
+        const POST_DATA = {
+            // 这里填写接口需要的入参
+            // 例如：survey_id: 25721826
+        };
 
-        // 页面加载时获取数据
         window.addEventListener('DOMContentLoaded', fetchAnswerData);
 
         /**
-         * 从接口获取问答数据
+         * POST 请求获取数据
          */
         async function fetchAnswerData() {
             const app = document.getElementById('app');
-            
-            // 显示加载状态
             app.innerHTML = '<div class="loading">数据加载中...</div>';
 
             try {
-                // 发送请求获取数据
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error(`接口请求失败：${response.status}`);
-                
+                // 核心：POST 请求配置
+                const response = await fetch(API_URL, {
+                    method: 'POST', // 请求方式改为 POST
+                    headers: {
+                        'Content-Type': 'application/json', // JSON 格式参数
+                        // 这里可添加 token 等请求头
+                        // 'Authorization': 'Bearer your-token'
+                    },
+                    body: JSON.stringify(POST_DATA) // POST 参数
+                });
+
+                if (!response.ok) throw new Error(`请求失败：${response.status}`);
                 const data = await response.json();
-                // 渲染数据到页面
                 renderData(data);
                 
             } catch (error) {
-                // 错误处理
                 console.error('数据获取失败：', error);
                 app.innerHTML = `<div class="error">数据加载失败：${error.message}</div>`;
             }
         }
 
         /**
-         * 解析并渲染数据到HTML
-         * @param {Object} data 接口返回的原始数据
+         * 渲染页面数据
          */
         function renderData(data) {
             const app = document.getElementById('app');
@@ -157,7 +164,7 @@
             const answerList = payload.answer || [];
             const userInfo = payload.third_party_user || {};
 
-            // 拼接基础信息HTML
+            // 基础信息
             let baseHtml = `
                 <div class="base-info">
                     <h3>用户基础信息</h3>
@@ -169,78 +176,52 @@
                 </div>
             `;
 
-            // 拼接问答内容HTML
+            // 问答内容
             let answerHtml = '<div class="answer-list">';
-            
             answerList.forEach((item, index) => {
                 answerHtml += `
                     <div class="answer-card">
                         <h4>问题组 ${index + 1} (ID: ${item.id})</h4>
                 `;
-
-                // 遍历问题列表
-                item.questions.forEach(question => {
-                    answerHtml += renderQuestion(question);
+                item.questions.forEach(q => {
+                    answerHtml += renderQuestion(q);
                 });
-
                 answerHtml += '</div>';
             });
-
             answerHtml += '</div>';
 
-            // 最终渲染到页面
             app.innerHTML = baseHtml + answerHtml;
         }
 
         /**
-         * 渲染单个问题（支持单选、文本等类型）
-         * @param {Object} question 问题对象
-         * @returns {String} HTML字符串
+         * 渲染单个问题
          */
         function renderQuestion(question) {
             let html = '<div class="question-item">';
-            
-            // 问题类型标签
             html += `<span class="question-type">${getTypeText(question.type)}</span>`;
-            
-            // 问题标题/描述
-            if (question.title) {
-                html += `<div class="question-title">${question.title}</div>`;
-            }
-            if (question.description) {
-                html += `<div class="question-title">${question.description}</div>`;
-            }
 
-            // 渲染答案
-            let answerText = '';
-            // 文本类型答案
+            if (question.title) html += `<div class="question-title">${question.title}</div>`;
+            if (question.description) html += `<div class="question-title">${question.description}</div>`;
+
+            let answer = '';
             if (question.text) {
-                answerText = question.text;
-            }
-            // 单选/多选类型答案
-            else if (question.options && question.options.length) {
-                const checkedOption = question.options.find(opt => opt.checked === 1);
-                answerText = checkedOption ? checkedOption.text : '未选择';
+                answer = question.text;
+            } else if (question.options) {
+                const opt = question.options.find(o => o.checked === 1);
+                answer = opt ? opt.text : '未选择';
             }
 
-            html += `<div class="answer-content">回答：${answerText || '无回答'}</div>`;
+            html += `<div class="answer-content">回答：${answer || '无'}</div>`;
             html += '</div>';
             return html;
         }
 
         /**
-         * 将问题类型英文转为中文
-         * @param {String} type 类型英文
-         * @returns {String} 类型中文
+         * 题型中文映射
          */
         function getTypeText(type) {
-            const typeMap = {
-                radio: '单选',
-                text: '文本',
-                checkbox: '多选',
-                textarea: '多行文本'
-            };
-            return typeMap[type] || type;
+            const map = { radio: '单选', text: '文本', checkbox: '多选', textarea: '多行文本' };
+            return map[type] || type;
         }
     </script>
 </body>
