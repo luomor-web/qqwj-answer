@@ -1,0 +1,190 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .container { padding: 1.5rem 0; max-width: 860px; }
+  .page-header { margin-bottom: 1.5rem; }
+  .page-header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .page-header p { font-size: 13px; color: var(--color-text-secondary); }
+  .search-bar { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .search-bar input { flex: 1; height: 36px; padding: 0 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; color: var(--color-text-primary); background: var(--color-background-primary); outline: none; }
+  .search-bar input:focus { box-shadow: 0 0 0 2px rgba(55,138,221,0.18); border-color: #378ADD; }
+  .search-bar button { height: 36px; padding: 0 18px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); font-size: 14px; cursor: pointer; transition: background 0.15s; }
+  .search-bar button:hover { background: var(--color-background-secondary); }
+  .search-bar button:active { transform: scale(0.98); }
+  .search-bar button.primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .search-bar button.primary:hover { background: #0C447C; }
+
+  .meta-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 12px; }
+  .meta-item label { font-size: 11px; color: var(--color-text-tertiary); letter-spacing: 0.04em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .meta-item span { font-size: 13px; color: var(--color-text-primary); font-weight: 500; }
+
+  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; letter-spacing: 0.03em; }
+  .answer-block { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); background: var(--color-background-primary); margin-bottom: 1rem; overflow: hidden; }
+  .answer-block-header { padding: 10px 14px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; }
+  .answer-block-header .block-id { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); font-family: var(--font-mono); }
+  .question-row { padding: 12px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .question-row:last-child { border-bottom: none; }
+  .q-id { font-size: 11px; color: var(--color-text-tertiary); font-family: var(--font-mono); margin-bottom: 4px; }
+  .q-type-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; margin-bottom: 6px; }
+  .badge-radio { background: #E6F1FB; color: #0C447C; }
+  .badge-text { background: #EAF3DE; color: #27500A; }
+  .badge-checkbox { background: #FAEEDA; color: #633806; }
+  .badge-default { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+
+  .q-title { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .q-desc { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 6px; }
+  .options-list { list-style: none; }
+  .option-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: var(--color-text-primary); }
+  .option-checked { color: #185FA5; font-weight: 500; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; }
+  .dot.checked { background: #185FA5; }
+  .text-answer { font-size: 14px; color: var(--color-text-primary); background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 10px; word-break: break-all; }
+
+  .error-msg { color: #A32D2D; font-size: 13px; padding: 10px 0; }
+  .empty-state { text-align: center; padding: 3rem 0; color: var(--color-text-tertiary); font-size: 14px; }
+  .loading { text-align: center; padding: 2rem 0; color: var(--color-text-secondary); font-size: 14px; }
+  .loading::after { content: ''; display: inline-block; width: 14px; height: 14px; border: 2px solid var(--color-border-secondary); border-top-color: #378ADD; border-radius: 50%; animation: spin 0.7s linear infinite; margin-left: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .user-card { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #E6F1FB; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: #0C447C; flex-shrink: 0; }
+  .user-info p { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .user-info span { font-size: 12px; color: var(--color-text-tertiary); }
+</style>
+
+<div class="container">
+  <h2 class="sr-only">问答数据查看器：通过 ID 查询并展示答题信息</h2>
+  <div class="page-header">
+    <h1>问答数据查看器</h1>
+    <p>输入记录 ID 查询并展示答题信息</p>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="answerIdInput" placeholder="输入答题记录 ID，例如：33cc555f-056f-4242-a97c-46f3e7d2016f" />
+    <button class="primary" onclick="fetchAnswer()">查询</button>
+  </div>
+
+  <div id="result-area"></div>
+</div>
+
+<script>
+function getBadgeClass(type) {
+  const map = { radio: 'badge-radio', text: 'badge-text', checkbox: 'badge-checkbox' };
+  return map[type] || 'badge-default';
+}
+
+function renderQuestion(q) {
+  let content = '';
+  if (q.title) content += `<div class="q-title">标题：${escHtml(q.title)}</div>`;
+  if (q.description) content += `<div class="q-desc">描述：${escHtml(q.description)}</div>`;
+
+  if (q.type === 'text' && q.text) {
+    content += `<div class="text-answer">${escHtml(q.text)}</div>`;
+  } else if (q.options && q.options.length > 0) {
+    content += '<ul class="options-list">';
+    q.options.forEach(opt => {
+      const checked = opt.checked == 1;
+      content += `<li class="option-item ${checked ? 'option-checked' : ''}">
+        <span class="dot ${checked ? 'checked' : ''}"></span>
+        ${escHtml(opt.text || opt.id)}
+        ${checked ? ' ✓' : ''}
+      </li>`;
+    });
+    content += '</ul>';
+  } else if (q.blanks && q.blanks.length > 0) {
+    q.blanks.forEach(b => {
+      content += `<div class="text-answer">${escHtml(b)}</div>`;
+    });
+  }
+
+  return `<div class="question-row">
+    <div class="q-id">${escHtml(q.id)}</div>
+    <span class="q-type-badge ${getBadgeClass(q.type)}">${escHtml(q.type)}</span>
+    ${content}
+  </div>`;
+}
+
+function renderAnswer(data) {
+  const payload = data.payload || {};
+  const answers = payload.answer || [];
+  const user = payload.third_party_user || {};
+  const name = user.nickname || user.openid || '匿名用户';
+  const initials = name.slice(0, 2);
+
+  let html = '';
+
+  html += `<div class="user-card">
+    <div class="avatar">${escHtml(initials)}</div>
+    <div class="user-info">
+      <p>${escHtml(name)}</p>
+      <span>${escHtml(payload.city || '')} ${escHtml(payload.province || '')} &nbsp;·&nbsp; ${escHtml(payload.started_at || '')} 开始 &nbsp;·&nbsp; 用时 ${payload.duration || 0}s</span>
+    </div>
+  </div>`;
+
+  html += `<div class="meta-card">
+    <div class="meta-item"><label>问卷 ID</label><span>${payload.survey_id || '-'}</span></div>
+    <div class="meta-item"><label>答题 ID</label><span>${payload.answer_id || '-'}</span></div>
+    <div class="meta-item"><label>开始时间</label><span>${payload.started_at || '-'}</span></div>
+    <div class="meta-item"><label>结束时间</label><span>${payload.ended_at || '-'}</span></div>
+  </div>`;
+
+  if (answers.length === 0) {
+    html += '<div class="empty-state">暂无答题数据</div>';
+  } else {
+    html += `<div class="section-title">答题内容（共 ${answers.length} 个分块）</div>`;
+    answers.forEach(block => {
+      const questions = block.questions || [];
+      let qHtml = questions.map(renderQuestion).join('');
+      html += `<div class="answer-block">
+        <div class="answer-block-header">
+          <span class="block-id">${escHtml(block.id)}</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary)">${questions.length} 题</span>
+        </div>
+        ${qHtml}
+      </div>`;
+    });
+  }
+
+  return html;
+}
+
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function fetchAnswer() {
+  const id = document.getElementById('answerIdInput').value.trim();
+  const area = document.getElementById('result-area');
+  if (!id) { area.innerHTML = '<div class="error-msg">请输入记录 ID</div>'; return; }
+
+  area.innerHTML = '<div class="loading">正在查询</div>';
+
+  try {
+    const resp = await fetch(`https://xlab.ai-space.net/api/activity/getAnwserInfo/${encodeURIComponent(id)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    console.log('原始数据:', data);
+    const payload = data.data.answerInfoJson || {};
+
+    if (!payload) {
+      area.innerHTML = '<div class="error-msg">返回数据格式异常，未找到 payload 字段</div>';
+      return;
+    }
+
+    area.innerHTML = renderAnswer(data);
+  } catch (e) {
+    area.innerHTML = `<div class="error-msg">请求失败：${escHtml(e.message)}。请检查接口地址或网络环境。</div>`;
+  }
+}
+
+document.getElementById('answerIdInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') fetchAnswer();
+});
+</script>
