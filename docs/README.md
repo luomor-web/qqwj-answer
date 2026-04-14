@@ -7,8 +7,7 @@ https://wj.qq.com/docs/webhook/
 
 可以从url参数中输入id，如?id=，并对页面进行美化
 
-更新README.md，增加agent.md
-将agent.md改为中文
+根据项目内容更新README.md，增加AGENT.md方便AI读取项目
 
 irm https://trae.cn/trae-cli/install.ps1 | iex 
 traecli
