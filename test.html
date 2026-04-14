@@ -147,7 +147,8 @@
 
                 if (!response.ok) throw new Error(`请求失败：${response.status}`);
                 const data = await response.json();
-                renderData(data);
+                console.log('原始数据:', data);
+                renderData(data.data.answerInfoJson);
                 
             } catch (error) {
                 console.error('数据获取失败：', error);
