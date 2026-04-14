@@ -1,35 +1,35 @@
-# Agent Documentation
+# 代理文档
 
-This document describes the agent configuration and usage for the qqwj-answer project.
+本文档描述了 qqwj-answer 项目中代理的配置和使用方法。
 
-## Overview
+## 概述
 
-The agent is designed to handle automated interactions and responses for the question-answer viewer.
+代理旨在处理问答查看器的自动化交互和响应。
 
-## Configuration
+## 配置
 
-- **API Endpoint**: Configure the endpoint for agent communication.
-- **Authentication**: Set up authentication tokens or keys.
-- **Parameters**: Define parameters for agent behavior.
+- **API 端点**：配置代理通信的端点。
+- **身份验证**：设置身份验证令牌或密钥。
+- **参数**：定义代理行为的参数。
 
-## Usage
+## 使用方法
 
-1. Initialize the agent with the required configuration.
-2. Send queries to the agent for processing.
-3. Receive and display responses.
+1. 使用所需配置初始化代理。
+2. 向代理发送查询进行处理。
+3. 接收并显示响应。
 
-## Examples
+## 示例
 
 ```javascript
-// Example code for initializing the agent
+// 初始化代理的示例代码
 const agent = new Agent({
   endpoint: 'https://api.example.com/agent',
   token: 'your-token-here'
 });
 ```
 
-## Troubleshooting
+## 故障排除
 
-- Ensure all dependencies are installed.
-- Check network connectivity.
-- Verify configuration settings.
+- 确保所有依赖项已安装。
+- 检查网络连接。
+- 验证配置设置。
