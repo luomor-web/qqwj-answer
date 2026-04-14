@@ -178,7 +178,7 @@ async function fetchAnswer() {
       return;
     }
 
-    area.innerHTML = renderAnswer(data);
+    area.innerHTML = renderAnswer(payload);
   } catch (e) {
     area.innerHTML = `<div class="error-msg">请求失败：${escHtml(e.message)}。请检查接口地址或网络环境。</div>`;
   }
